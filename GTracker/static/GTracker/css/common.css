@@ -1,0 +1,13 @@
+
+table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+}
+table thead,tbody, tr, td, tfoot {
+          border: 1px solid #e9ecef;
+}
+
+.bold-font {
+    font-weight: bold;
+}

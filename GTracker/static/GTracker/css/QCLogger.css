@@ -1,0 +1,27 @@
+body {
+  padding-top: 5rem;
+}
+.starter-template {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.ucode-submit-form {
+    margin:0px auto;
+    padding: 0px 0px 0px 00px;
+}
+
+.ucode-submit-form li {
+    list-style: none;
+    padding: 0px 0px 15px 0px;
+}
+
+.ucode-submit-form label{
+    font-weight: bold;
+}
+
+#error-info {
+    font-weight: bold;
+    color:#F00;
+    font-size:24px;
+}
