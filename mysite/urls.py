@@ -20,6 +20,8 @@ import GTracker.views
 
 urlpatterns = [
     url(r'^$', GTracker.views.index),
+    url(r'others/', GTracker.views.others),
+
     url(r'^GTracker/', include('GTracker.urls')),
     url(r'^admin/', admin.site.urls),
 ]

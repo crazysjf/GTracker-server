@@ -7,3 +7,6 @@ from django.shortcuts import render
 def index(request):
 
     return render(request, 'GTracker/index.html')
+
+def others(request):
+    return render(request, 'GTracker/others.html')
