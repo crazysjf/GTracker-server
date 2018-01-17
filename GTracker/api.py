@@ -9,29 +9,41 @@ import db
 from django.http import HttpResponse
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from datetime import date, datetime, timedelta
 
 
 def records(request):
+    global  date
     db.init(db_path)
-    rs = db.get_records3('162545180')
+    shop_id = request.GET.get('shop_id',"")
+
+    date_range = 30
+    # 获取指定shop_id的30内所有记录
+    end_date = date.today()
+    start_date = end_date - timedelta(date_range)
+    rs = db.get_records_with_shop_id_in_date_range(shop_id, start_date, end_date)
     result = {}
+
     for r in rs:
         good_id     = r[0]
-        sales_30    = r[1]
-        v = []
+        date        = datetime.strptime(r[1],'%Y-%m-%d').date()
+        sales_30    = r[2]
+        good_data = {}
         if result.has_key(good_id):
-            v = result[good_id]
+            good_data = result[good_id]
         else:
-            result[good_id] = v
-        v.append(sales_30)
+            good_data['sales_30'] = [100] * (date_range + 1)
+            result[good_id] = good_data
+        idx = (date - start_date).days
+        good_data['sales_30'][idx] = sales_30
 
-    array =[]
-    for key in result.keys():
-        d = {}
-        d['text'] = key
-        d['values'] = result[key]
-        array.append(d)
-    return HttpResponse(json.dumps(array, cls=DjangoJSONEncoder), content_type="application/json")
+    # _r = {}
+    # for i,k in enumerate(result.keys()):
+    #     if i < 5:
+    #         _r[k] = result[k]
+    #     else:
+    #         break
+    return HttpResponse(json.dumps(result, cls=DjangoJSONEncoder), content_type="application/json")
     # eName           = request.GET.get('employee',"")
     # startDateStr       = request.GET.get('startDate', "")
     # endDateStr         = request.GET.get('endDate', "")
