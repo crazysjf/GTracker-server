@@ -12,6 +12,25 @@ from django.core.serializers.json import DjangoJSONEncoder
 from datetime import date, datetime, timedelta
 
 
+def gen_diff(a):
+    '''
+    计算数组a的差分并返回。
+    a中允许有None存在。
+    返回数组的长度比a的长度小1。
+    '''
+    def remove_none(a):
+        '''去掉数组a里面的None：如果第一个值为None，则替换为0，如果不是第一个值为None，则替换为结果数组里面的前一个值'''
+        r = [0] * len(a)
+        for i in range(0, len(a)):
+            if a[i] == None:
+                 r[i] = 0 if i == 0 else r[i-1]
+            else:
+                r[i] = a[i]
+        return r
+    b = remove_none(a)
+    c = [b[i] - b[i-1] for i,x in enumerate(b) if i > 0]
+    return c
+
 def records(request):
     global  date
     db.init(db_path)
@@ -20,8 +39,11 @@ def records(request):
     date_range = 30
     # 获取指定shop_id的30内所有记录
     end_date = date.today()
-    start_date = end_date - timedelta(date_range)
+    start_date = end_date - timedelta(date_range - 1)
     rs = db.get_records_with_shop_id_in_date_range(shop_id, start_date, end_date)
+
+    # {<good_id_1>: {sales_30: [d11, d12, ...],
+    #  <good_id_2>: {sales_30: [d21, d22,...]}
     result = {}
 
     for r in rs:
@@ -32,10 +54,14 @@ def records(request):
         if result.has_key(good_id):
             good_data = result[good_id]
         else:
-            good_data['sales_30'] = [100] * (date_range + 1)
+            good_data['sales_30'] = [None] * (date_range + 1)
             result[good_id] = good_data
         idx = (date - start_date).days
         good_data['sales_30'][idx] = sales_30
+
+    for good_id in result.keys():
+        good_data = result[good_id]
+        good_data['sales'] = gen_diff(good_data['sales_30'])
 
     # _r = {}
     # for i,k in enumerate(result.keys()):
@@ -43,6 +69,10 @@ def records(request):
     #         _r[k] = result[k]
     #     else:
     #         break
+    # r = {}
+    # for good_id in result.keys():
+    #     good_data = result[good_id]
+    #     r[good_id] = good_data
     return HttpResponse(json.dumps(result, cls=DjangoJSONEncoder), content_type="application/json")
     # eName           = request.GET.get('employee',"")
     # startDateStr       = request.GET.get('startDate', "")

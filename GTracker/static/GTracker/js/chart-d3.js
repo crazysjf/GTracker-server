@@ -48,7 +48,7 @@
          // var yearAve = _.reduce(data, function(m, v) {return m + v;}, 0) / 12;
          // var yearMax = _.max(data);
          // var yearMin = _.min(data);
-  	 	   return {good_id: k, sales_30: data['sales_30']};
+  	 	   return {good_id: k, sales: data['sales']};
   	  });
      	this.data =  dataset
 
@@ -158,7 +158,7 @@
     		.range([0, this.lineWidth]);
 
     	this.yScale = d3.scale.linear()
-    		.domain([0, 500])
+    		.domain([0, 100])
     		.range([this.lineHeight, 0]);
 
     	this.colorScale = d3.scale.linear()
@@ -195,7 +195,7 @@
       goods
         .append('path')
         .attr('d', function(d, i) {
-          return that.svgLine(d.sales_30);
+          return that.svgLine(d.sales);
         });
 
       //Base and end lines
@@ -213,7 +213,7 @@
         .attr('x1', 0)
         .attr('y1', this.yScale(0))
         .attr('x2', 0)
-        .attr('y2', function(d) {return that.yScale(d.sales_30[0]);});
+        .attr('y2', function(d) {return that.yScale(d.sales[0]);});
 
       goods
         .append('line')
@@ -221,7 +221,7 @@
         .attr('x1', this.xScale(30))
         .attr('y1', this.yScale(0))
         .attr('x2', this.xScale(30))
-        .attr('y2', function(d) {return that.yScale(d.sales_30[30]);});
+        .attr('y2', function(d) {return that.yScale(d.sales[29]);});
 
       goods
         .append('text')
