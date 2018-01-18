@@ -9,7 +9,10 @@
 
     perspectiveOffsetX: 5,
     perspectiveOffsetY: 4.5,
-
+    leftMargin: 30,
+    bottomMargin:30,
+    svgWidth  : 1200,
+    svgHeight : 800,
     chartHeight: 500,
     lineWidth: 600,
     lineHeight: 150,
@@ -106,13 +109,12 @@
         .filter(function(d, i) {return i === index;})
   			.classed('hover', true);
 
-  		d3.selectAll('.axes')
-    		.attr('transform', that.translate(30 + index * that.perspectiveOffsetX, that.chartHeight + that.yScale(0) + -index * that.perspectiveOffsetY));
-
+       d3.select('#chart g.goods')
+         .attr('transform', this.translate(that.leftMargin - index * that.perspectiveOffsetX, -that.bottomMargin + index*that.perspectiveOffsetY))
       goods
   			.style('opacity', function(d, i) {
           if(i < index) return 0;
-          return that.colorScale(i);
+          return that.colorScale(i-index);
   			});
 
       var datum = goods.filter(function(d, i) {return i === index;}).datum();
@@ -160,7 +162,7 @@
     		.range([this.lineHeight, 0]);
 
     	this.colorScale = d3.scale.linear()
-    		.domain([0, 102])
+    		.domain([0, 100])
     		.range([1, 0.5]);
 
       this.svgLine = d3.svg.line()
@@ -170,9 +172,11 @@
 
       // YEAR LINES
     	var goods = d3.select('#chart svg')
+        .attr('height', that.svgHeight + 'px')
+        .attr('width', that.svgWidth + 'px')
     		.append('g')
     		.classed('goods', true)
-    		.attr('transform', this.translate(30, this.chartHeight))
+    		//.attr('transform', this.translate(30, this.chartHeight))
         .selectAll('g.good')
         .data(this.data)
         .enter()
@@ -181,7 +185,7 @@
         .classed('good', true)
         //.sort(this.sortFunction[this.uiState.sortBy])
         .attr('transform', function(d, i) {
-          return that.translate(i * that.perspectiveOffsetX, -i * that.perspectiveOffsetY);
+          return that.translate(i * that.perspectiveOffsetX, that.svgHeight - that.lineHeight -i * that.perspectiveOffsetY);
         })
         .style('opacity', function(d, i) {
           return that.colorScale(i);
@@ -237,7 +241,7 @@
     	d3.select('#chart svg')
     		.append('g')
     		.classed('axes', true)
-    		.attr('transform', this.translate(30, this.chartHeight));
+    		.attr('transform', this.translate(this.leftMargin, that.svgHeight - this.bottomMargin));
 
     	this.renderAxes();
     },
