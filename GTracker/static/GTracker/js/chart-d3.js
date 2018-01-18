@@ -55,7 +55,7 @@
 
     	d3.select('body').style('height', this.bodyHeight + 'px');
     	this.windowHeight = $(window).height();
-    	this.scrollScale = d3.scale.linear().domain([0, this.bodyHeight - this.windowHeight * 0.99]).range([0, 102]).clamp(true);
+    	this.scrollScale = d3.scale.linear().domain([0, this.bodyHeight - this.windowHeight]).range([0, this.data.length - 1]).clamp(true);
 
       this.sortFunction.year = function(a, b) {return d3.descending(a.year, b.year);}
       this.sortFunction.mean = function(a, b) {return d3.descending(a.mean, b.mean);}
