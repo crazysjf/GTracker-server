@@ -91,7 +91,7 @@ p.item {
 }
 
 #chart {
-	position: fixed;
+	/*position: fixed;*/
 }
 
 /* SVG styling */

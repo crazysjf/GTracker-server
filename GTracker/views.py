@@ -4,9 +4,11 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 
 # Create your views here.
-def index(request):
+def perspective(request):
+    return render(request, 'GTracker/perspective.html')
 
-    return render(request, 'GTracker/index.html')
+def grid(request):
+    return render(request, 'GTracker/grid.html')
 
 def others(request):
     return render(request, 'GTracker/others.html')

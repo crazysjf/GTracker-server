@@ -1,0 +1,40 @@
+{% include "GTracker/_header.html"%}
+
+<div id="chart">
+    <svg>
+    </svg>
+</div>
+<div id="widgets">
+    <div id="header">
+        <h1>UK Temperature History</h1>
+        <p>Explore the temperature in the United Kingdom since 1910 by scrolling the page <span
+                class="emphasis">up</span> and <span class="emphasis">down</span>. Visit years marked in <span
+                style="color: indianred;">red</span> or <span style="color: steelblue;">blue</span> that have
+            significant weather events. You can also sort by <span class="emphasis">year</span>, <span class="emphasis">maximum</span>,
+            <span class="emphasis">minimum</span> or <span class="emphasis">mean</span> temperature</p>
+    </div>
+    <div id="menu">
+    </div>
+    <div id="info">
+    </div>
+</div>
+
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'GTracker/css/reset.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'GTracker/css/common.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'GTracker/css/QCLogger.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'GTracker/css/style.css' %}">
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+<!-- Optional JavaScript -->
+<script src="{% static 'GTracker/js/common.js' %}" type="text/javascript"></script>
+<script src="{% static 'GTracker/js/main.js' %}" type="text/javascript"></script>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="http://underscorejs.org/underscore-min.js"></script>
+<script src="{% static 'GTracker/js/perspective-d3.js' %}" type="text/javascript"></script>
+
+{% include "GTracker/_footer.html"%}

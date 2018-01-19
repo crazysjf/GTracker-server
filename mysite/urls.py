@@ -19,7 +19,10 @@ from django.conf.urls import include, url
 import GTracker.views
 
 urlpatterns = [
-    url(r'^$', GTracker.views.index),
+    url(r'^$', GTracker.views.grid),
+    url(r'^grid/$', GTracker.views.grid),
+    url(r'^perspective/$', GTracker.views.perspective),
+
     url(r'others/', GTracker.views.others),
 
     url(r'^GTracker/', include('GTracker.urls')),
