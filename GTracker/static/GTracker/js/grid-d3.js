@@ -209,7 +209,6 @@ var chart = {
             .classed('good', true)
             //.sort(this.sortFunction[this.uiState.sortBy])
             .attr('transform', function (d, i) {
-
                 xOffset = (i % that.columnNr) * (that.chartWidth + that.hMargin)
                 yOffset = parseInt(i / that.columnNr) * (that.chartHeight + that.vMargin)
                 return that.translate(xOffset, yOffset);
@@ -222,13 +221,27 @@ var chart = {
                 return that.svgLine(d.sales);
             });
 
+        var monthScale = d3.scale.ordinal()
+            .domain(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+            .rangePoints([0, that.chartWidth]);
+
+        var yAxis = d3.svg.axis()
+            .scale(this.yScale)
+            .orient('left')
+
+        var xAxis = d3.svg.axis()
+            .scale(monthScale)
+            .orient('bottom');
+        goods.append('g').call(xAxis)
+        goods.append('g').call(yAxis)
+
+        //.tickValues([0, 2, 4, 6, 8, 10, 12, 14, 16]);
 
         // d3.select('#chart svg')
         //     .append('g')
         //     .classed('axes', true)
         //     .attr('transform', this.translate(this.leftMargin, that.svgHeight - this.bottomMargin));
-
-        this.renderAxes();
+        //this.renderAxes();
     },
 
     renderAxes: function () {
