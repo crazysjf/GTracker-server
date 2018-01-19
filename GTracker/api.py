@@ -12,24 +12,53 @@ from django.core.serializers.json import DjangoJSONEncoder
 from datetime import date, datetime, timedelta
 
 
+# def gen_diff(a):
+#     '''
+#     计算数组a的差分并返回。
+#     a中允许有None存在。
+#     返回数组的长度比a的长度小1。
+#     '''
+#     def remove_none(a):
+#         '''去掉数组a里面的None：如果第一个值为None，则替换为0，如果不是第一个值为None，则替换为结果数组里面的前一个值'''
+#         r = [0] * len(a)
+#         for i in range(0, len(a)):
+#             if a[i] == None:
+#                  r[i] = 0 if i == 0 else r[i-1]
+#             else:
+#                 r[i] = a[i]
+#         return r
+#     b = remove_none(a)
+#     c = [b[i] - b[i-1] for i,x in enumerate(b) if i > 0]
+#     return c
+
 def gen_diff(a):
     '''
     计算数组a的差分并返回。
-    a中允许有None存在。
+    a中允许有None存在.
     返回数组的长度比a的长度小1。
+    假设返回值为r:
+    如果a[i] == None, 则r[i] = None；
+    如果a[i] != None，则r[i] = a[i]和最近一个非空值的差。
+    如果a[0] == None则当0处理
+    
+    [1, 2, 3]    => [1, 1]
+    [1, None, 3] => [None, 2]
+    [None, 2, 3] => [2, 1]
+    [None, None, 3] => [None, 3]
     '''
-    def remove_none(a):
-        '''去掉数组a里面的None：如果第一个值为None，则替换为0，如果不是第一个值为None，则替换为结果数组里面的前一个值'''
-        r = [0] * len(a)
-        for i in range(0, len(a)):
-            if a[i] == None:
-                 r[i] = 0 if i == 0 else r[i-1]
+    r = [None] * (len(a) - 1)
+    last_unnone = 0 if a[0] == None else a[0] # 最近一个非None值
+    for i in range(1, len(a)):
+        if a[i] == None:
+            r[i-1] = None
+        else:
+            if a[i - 1] == None:
+                r[i-1] = a[i] - last_unnone
             else:
-                r[i] = a[i]
-        return r
-    b = remove_none(a)
-    c = [b[i] - b[i-1] for i,x in enumerate(b) if i > 0]
-    return c
+                r[i-1] = a[i] - a[i-1]
+            last_unnone = a[i]
+    return r
+
 
 def records(request):
     global  date

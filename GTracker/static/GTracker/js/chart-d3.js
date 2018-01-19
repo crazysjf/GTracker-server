@@ -167,6 +167,7 @@
 
       this.svgLine = d3.svg.line()
         .interpolate('cardinal')
+          .defined(function(d) { return d })
         .x(function(d, i) {return that.xScale(i);})
         .y(function(d) {return that.yScale(d);});
 
