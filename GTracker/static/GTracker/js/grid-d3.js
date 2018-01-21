@@ -25,7 +25,7 @@ var chart = {
     chartHeight: 100,   // 单个表宽高
     chartWidth: 300,
 
-    hMargin: 20, // 表之间水平和垂直间隙
+    hMargin: 30, // 表之间水平和垂直间隙
     vMargin: 20,
 
     columnNr: 4,
@@ -59,9 +59,9 @@ var chart = {
 
         var dataset = _.map(this.data, function (data, k) {
             // var yearAve = _.reduce(data, function(m, v) {return m + v;}, 0) / 12;
-            // var yearMax = _.max(data);
-            // var yearMin = _.min(data);
-            return {good_id: k, sales: data['sales']};
+            var max = _.max(data['sales']);
+            var min = _.min(data['sales']);
+            return {good_id: k, sales: data['sales'], max: max, min: min};
         });
         this.data = dataset
 
@@ -172,25 +172,28 @@ var chart = {
             .domain([0, that.dayRange -1])
             .range([0, this.chartWidth]);
 
-        this.yScale = d3.scale.linear()
-            .domain([0, 100])
-            .range([this.chartHeight, 0]);
+        // this.yScale = d3.scale.linear()
+        //     .domain([0, 100])
+        //     .range([this.chartHeight, 0]);
+        // yScale = d3.scale.linear()
+        //     .domain([d.min, d.max])
+        //     .range([that.chartHeight, 0]);
 
-        this.svgLine = d3.svg.line()
-            .interpolate('cardinal')
-            .defined(function (d) {
-                return d
-            })
-            .x(function (d, i) {
-                return that.xScale(i);
-            })
-            .y(function (d) {
-                return that.yScale(d);
-            });
+        // this.svgLine = d3.svg.line()
+        //     .interpolate('cardinal')
+        //     .defined(function (d) {
+        //         return d
+        //     })
+        //     .x(function (d, i) {
+        //         return that.xScale(i);
+        //     })
+        //     .y(function (d) {
+        //         return that.yScale(d);
+        //     });
 
         n = Math.ceil(this.data.length / 4)
-        this.svgHeight = n * (this.chartHeight + this.vMargin)
-        this.svgWidth = this.columnNr * (this.chartWidth + this.hMargin)
+        this.svgHeight = n * (this.chartHeight + this.vMargin * 2)
+        this.svgWidth = this.columnNr * (this.chartWidth + this.hMargin * 2)
 
         // YEAR LINES
         var goods = d3.select('#chart svg')
@@ -209,65 +212,71 @@ var chart = {
             .classed('good', true)
             //.sort(this.sortFunction[this.uiState.sortBy])
             .attr('transform', function (d, i) {
-                xOffset = (i % that.columnNr) * (that.chartWidth + that.hMargin)
-                yOffset = parseInt(i / that.columnNr) * (that.chartHeight + that.vMargin)
+                xOffset = that.hMargin + (i % that.columnNr) * (that.chartWidth + that.hMargin)
+                yOffset = that.vMargin + parseInt(i / that.columnNr) * (that.chartHeight + that.vMargin)
                 return that.translate(xOffset, yOffset);
             })
 
-        // Add paths
-        goods
-            .append('path')
-            .attr('d', function (d, i) {
-                return that.svgLine(d.sales);
-            });
+        function yScaleGen(min, max) {
+            return d3.scale.linear()
+                .domain([min, max])
+                .range([that.chartHeight, 0]);
+        }
 
-        var monthScale = d3.scale.ordinal()
-            .domain(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-            .rangePoints([0, that.chartWidth]);
+        function svgLineGen(yScale) {
+            //that = this
+            return d3.svg.line()
+                .interpolate('cardinal')
+                .defined(function (d) {
+                    return d
+                })
+                .x(function (d, i) {
+                    return that.xScale(i);
+                })
+                .y(function (d) {
+                    return yScale(d);
+                });
+        }
 
-        var yAxis = d3.svg.axis()
-            .scale(this.yScale)
-            .orient('left')
+        function axes(d, i) {
+            t = d3.select(this) // this即为当前的元素。这个元素必须要做成一个selection才能够进行后面的操作。
+            var monthScale = d3.scale.ordinal()
+                .rangePoints([0, that.chartWidth]);
+            var xAxis = d3.svg.axis()
+                .scale(monthScale)
+                .orient('bottom');
+            var yScale = yScaleGen(d.min, d.max)
 
-        var xAxis = d3.svg.axis()
-            .scale(monthScale)
-            .orient('bottom');
-        goods.append('g').call(xAxis)
-        goods.append('g').call(yAxis)
+            var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient('left')
 
-        //.tickValues([0, 2, 4, 6, 8, 10, 12, 14, 16]);
+            axes = t.append('g').classed('axes', true)
+            axes.append('g')
+                .classed('axis x', true)
+                .attr("transform", "translate(" + 0 + "," + that.chartHeight + ")")
+                .call(xAxis)
+            axes.append('g')
+                .classed('axis y', true)
+                .call(yAxis)
 
-        // d3.select('#chart svg')
-        //     .append('g')
-        //     .classed('axes', true)
-        //     .attr('transform', this.translate(this.leftMargin, that.svgHeight - this.bottomMargin));
-        //this.renderAxes();
-    },
+            t.append('path')
+                 .attr('d', function (d, i) {
+                     return svgLineGen(yScale)(d.sales)
+                 });
+        }
 
-    renderAxes: function () {
-        var monthScale = d3.scale.ordinal()
-            .domain(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-            .rangePoints([0, this.chartWidth]);
+        // goods.append('path')
+        //     .attr('d', function (d, i) {
+        //         return that.svgLine(d.sales);
+        //     });
 
-        var yAxis = d3.svg.axis()
-            .scale(this.yScale)
-            .orient('left')
-        //.tickValues([0, 2, 4, 6, 8, 10, 12, 14, 16]);
-
-        d3.select('#chart .axes')
-            .append('g')
-            .classed('axis y', true)
-            .attr('transform', this.translate(0, -this.yScale(0)))
-            .call(yAxis);
-
-        var xAxis = d3.svg.axis()
-            .scale(monthScale)
-            .orient('bottom');
-
-        d3.select('#chart .axes')
-            .append('g')
-            .classed('axis x', true)
-            .call(xAxis);
+        goods.each(axes)
+        // function line(d,i) {
+        //     t = d3.select(this)
+        //
+        // }
+//        goods.each(line)
     },
 
     updateSort: function (sortBy) {
