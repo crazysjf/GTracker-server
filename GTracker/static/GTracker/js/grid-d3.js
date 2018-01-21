@@ -4,11 +4,7 @@ var chart = {
     data: null,
     xScale: null,
     yScale: null,
-    svgLine: null,
-    colorScale: null,
 
-    perspectiveOffsetX: 5,
-    perspectiveOffsetY: 4.5,
     leftMargin: 30,
     bottomMargin: 30,
     svgWidth: 1200,
@@ -64,106 +60,8 @@ var chart = {
             return {good_id: k, sales: data['sales'], max: max, min: min};
         });
         this.data = dataset
-
-
-        //d3.select('body')//.style('height', this.bodyHeight + 'px');
-        // this.windowHeight = $(window).height();
-        // this.scrollScale = d3.scale.linear().domain([0, this.bodyHeight - this.windowHeight]).range([0, this.data.length - 1]).clamp(true);
-
-        // this.sortFunction.year = function (a, b) {
-        //     return d3.descending(a.year, b.year);
-        // }
-        // this.sortFunction.mean = function (a, b) {
-        //     return d3.descending(a.mean, b.mean);
-        // }
-        // this.sortFunction.max = function (a, b) {
-        //     return d3.descending(a.max, b.max);
-        // }
-        // this.sortFunction.min = function (a, b) {
-        //     return d3.ascending(a.min, b.min);
-        // }
-
         this.initChart();
-       // this.initEvents();
-       // this.initMenu();
     },
-
-    // initMenu: function () {
-    //     var that = this;
-    //     d3.select('#menu')
-    //         .text('Sort by: ')
-    //         .selectAll('span')
-    //         .data(this.menu)
-    //         .enter()
-    //         .append('span')
-    //         .html(function (d, i) {
-    //             var html = '<span class="button">' + d.label + '</span>';
-    //             if (i < that.menu.length - 1) html += ' / ';
-    //             return html;
-    //         });
-    //
-    //     d3.select('#menu')
-    //         .selectAll('span.button')
-    //         .classed('selected', function (d, i) {
-    //             return i === 0;
-    //         })
-    //         .on('click', function () {
-    //             var d = d3.select(this.parentNode).datum();
-    //             console.log(d, d.sortBy);
-    //
-    //             d3.selectAll('#menu span.button')
-    //                 .classed('selected', false);
-    //
-    //             d3.select(this)
-    //                 .classed('selected', true);
-    //
-    //             that.updateSort(d.sortBy);
-    //         });
-    // },
-    //
-    // updateVisibleYears: function () {
-    //     var that = chart; // Better way to do this?
-    //
-    //     var index = that.uiState.selectedIndex;
-    //     var goods = d3.selectAll('#chart .goods g.good');
-    //     goods.classed('hover', false);
-    //
-    //     goods
-    //         .filter(function (d, i) {
-    //             return i === index;
-    //         })
-    //         .classed('hover', true);
-    //
-    //     d3.select('#chart g.goods')
-    //         .attr('transform', this.translate(that.leftMargin - index * that.perspectiveOffsetX, -that.bottomMargin + index * that.perspectiveOffsetY))
-    //     goods
-    //         .style('opacity', function (d, i) {
-    //             if (i < index) return 0;
-    //             return that.colorScale(i - index);
-    //         });
-    //
-    //     var datum = goods.filter(function (d, i) {
-    //         return i === index;
-    //     }).datum();
-    //     that.uiState.selectedDatum = datum;
-    //
-    //     that.updateInfo();
-    // },
-
-
-    // handleScroll: function () {
-    //     var that = chart; // Better way to do this?
-    //     if (that.uiState.sorting) return;
-    //     var scroll = $(window).scrollTop();
-    //     that.uiState.selectedIndex = Math.round(that.scrollScale(scroll));
-    //     that.updateVisibleYears();
-    // },
-
-    // initEvents: function () {
-    //     var that = this;
-    //     $(window).scroll(this.handleScroll);
-    //     $(window).on('touchmove', this.handleScroll);
-    // },
 
     initChart: function () {
         var that = this;
@@ -171,25 +69,6 @@ var chart = {
         this.xScale = d3.scale.linear()
             .domain([0, that.dayRange -1])
             .range([0, this.chartWidth]);
-
-        // this.yScale = d3.scale.linear()
-        //     .domain([0, 100])
-        //     .range([this.chartHeight, 0]);
-        // yScale = d3.scale.linear()
-        //     .domain([d.min, d.max])
-        //     .range([that.chartHeight, 0]);
-
-        // this.svgLine = d3.svg.line()
-        //     .interpolate('cardinal')
-        //     .defined(function (d) {
-        //         return d
-        //     })
-        //     .x(function (d, i) {
-        //         return that.xScale(i);
-        //     })
-        //     .y(function (d) {
-        //         return that.yScale(d);
-        //     });
 
         n = Math.ceil(this.data.length / 4)
         this.svgHeight = n * (this.chartHeight + this.vMargin * 2)
@@ -238,7 +117,7 @@ var chart = {
                 });
         }
 
-        function axes(d, i) {
+        function drawOneChart(d, i) {
             t = d3.select(this) // this即为当前的元素。这个元素必须要做成一个selection才能够进行后面的操作。
             var monthScale = d3.scale.ordinal()
                 .rangePoints([0, that.chartWidth]);
@@ -266,17 +145,7 @@ var chart = {
                  });
         }
 
-        // goods.append('path')
-        //     .attr('d', function (d, i) {
-        //         return that.svgLine(d.sales);
-        //     });
-
-        goods.each(axes)
-        // function line(d,i) {
-        //     t = d3.select(this)
-        //
-        // }
-//        goods.each(line)
+        goods.each(drawOneChart)
     },
 
     updateSort: function (sortBy) {
