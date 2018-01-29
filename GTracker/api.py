@@ -5,12 +5,13 @@ sys.path.append(db_path)
 from django.shortcuts import render
 import logging
 logger = logging.getLogger("django")
-import db
+from db.db import DB
 from django.http import HttpResponse
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 from datetime import date, datetime, timedelta
-
+from network.dzt_crawler import DztCrawler as Crawler
+from django.template.loader import render_to_string
 
 # def gen_diff(a):
 #     '''
@@ -62,7 +63,7 @@ def gen_diff(a):
 
 def records(request):
     global  date
-    db.init(db_path)
+    db = DB()
     shop_id = request.GET.get('shop_id',"")
 
     date_range = 30
@@ -141,3 +142,12 @@ def records(request):
     # a['datetimeList']   = datetimeList
     #
     # return HttpResponse(json.dumps(a, cls=DjangoJSONEncoder), content_type="application/json")v
+
+def need_log_in(request):
+    f = Crawler.need_log_in_flag()
+    return HttpResponse(json.dumps(f, cls=DjangoJSONEncoder), content_type="application/json")
+
+def log_in_frag(request):
+    
+    html = render_to_string("GTracker/need_log_in_frag.html")
+    return HttpResponse(json.dumps(html, cls=DjangoJSONEncoder), content_type="application/json")

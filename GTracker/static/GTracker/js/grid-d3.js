@@ -197,3 +197,13 @@ d3.json('http://127.0.0.1:8000/GTracker/records/?shop_id=162545180', function (d
     chart.init();
     //chart.updateVisibleYears();
 });
+
+$(document).ready(function(){
+    $.get("api/need_log_in/",function(data,status){
+        if (data == true) {
+            $.get("api/log_in_frag/", function (data) {
+                $("div#flash").html("" + data);
+            })
+        }
+    });
+})

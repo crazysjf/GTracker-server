@@ -1,0 +1,18 @@
+# 运行运行redis服务器
+把配置文件中的daemonize设为yes
+运行redis-server
+
+# 运行celery服务器
+GTracker为包含celery任务的包。
+运行：
+cd <server-path>
+celery -A GTracker worker # 注：必须改为后台运行
+
+
+
+# 运行celery的监视器
+pip install flower
+cd <server-path>
+flower -A GTracker --broker=redis://localhost:6379
+
+然后可以用浏览器打开5555端口实时查看任务状态。似乎只能查看到flower运行之后提交的任务，之前的查看不到。

@@ -17,6 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.conf.urls import include, url
 import GTracker.views
+import GTracker.api
 
 urlpatterns = [
     url(r'^$', GTracker.views.grid),
@@ -27,4 +28,7 @@ urlpatterns = [
 
     url(r'^GTracker/', include('GTracker.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'api/records/', GTracker.api.records, name='records'),
+    url(r'api/need_log_in/', GTracker.api.need_log_in, name='need_log_in'),
+    url(r'api/log_in_frag/', GTracker.api.log_in_frag, name='log_in_frag'),
 ]
