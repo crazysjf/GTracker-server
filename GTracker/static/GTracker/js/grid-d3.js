@@ -72,7 +72,7 @@ var chart = {
     chartHeight: 100,   // 单个表宽高
     chartWidth: 300,
 
-    hMargin: 30, // 表之间水平和垂直间隙
+    hMargin: 60, // 表之间水平和垂直间隙
     vMargin: 40,
 
     columnNr: 4,
