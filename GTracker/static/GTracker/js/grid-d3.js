@@ -1,3 +1,5 @@
+"use strict";
+
 
 /**
  * 函数说明：获取字符串长度
@@ -24,10 +26,10 @@ function getStrLength(str) {
 function cutstr(str, len) {
     var str_length = 0;
     var str_len = 0;
-    str_cut = new String();
+    var str_cut = new String();
     str_len = str.length;
     for (var i = 0; i < str_len; i++) {
-        a = str.charAt(i);
+        var a = str.charAt(i);
         str_length++;
         if (escape(a).length > 4) {
             //中文字符的长度经编码之后大于4
@@ -124,7 +126,7 @@ var chart = {
             .domain([0, that.dayRange -1])
             .range([0, this.chartWidth]);
 
-        n = Math.ceil(this.data.length / 4)
+        var n = Math.ceil(this.data.length / 4)
         this.svgHeight = n * (this.chartHeight + this.vMargin * 2)
         this.svgWidth  = this.columnNr * (this.chartWidth + this.hMargin * 2)
 
@@ -145,8 +147,8 @@ var chart = {
             .classed('good', true)
             //.sort(this.sortFunction[this.uiState.sortBy])
             .attr('transform', function (d, i) {
-                xOffset = that.hMargin + (i % that.columnNr) * (that.chartWidth + that.hMargin)
-                yOffset = that.vMargin + parseInt(i / that.columnNr) * (that.chartHeight + that.vMargin)
+                var xOffset = that.hMargin + (i % that.columnNr) * (that.chartWidth + that.hMargin)
+                var yOffset = that.vMargin + parseInt(i / that.columnNr) * (that.chartHeight + that.vMargin)
                 return that.translate(xOffset, yOffset);
             })
 
@@ -175,7 +177,7 @@ var chart = {
 
 
         function drawOneChart(d, i) {
-            t = d3.select(this) // this即为当前的元素。这个元素必须要做成一个selection才能够进行后面的操作。
+            var t = d3.select(this) // this即为当前的元素。这个元素必须要做成一个selection才能够进行后面的操作。
             var monthScale = d3.scale.ordinal()
                 .rangePoints([0, that.chartWidth]);
             var xAxis = d3.svg.axis()
@@ -187,7 +189,7 @@ var chart = {
                 .scale(yScale)
                 .orient('left')
 
-            axes = t.append('g').classed('axes', true)
+            var axes = t.append('g').classed('axes', true)
             axes.append('g')
                 .classed('axis x', true)
                 .attr("transform", "translate(" + 0 + "," + that.chartHeight + ")")
@@ -200,7 +202,7 @@ var chart = {
                  .attr('d', function (d, i) {
                      return svgLineGen(yScale)(d.sales)
                  });
-            shortenedName = cutstr(d.name, Math.floor(that.chartWidth/that.fontSize)*2 - 2)
+            var shortenedName = cutstr(d.name, Math.floor(that.chartWidth/that.fontSize)*2 - 2)
             t.append('text')
                 .classed('good-name', true)
                 .attr('x',0)
@@ -227,7 +229,7 @@ var chart = {
         // Persist the chosen year: get the index of the chosen year
         d3.selectAll('#chart .years g.year')
             .each(function (d, i) {
-                if (d.year === that.uiState.selectedDatum.year) index = i;
+                if (d.year === that.uiState.selectedDatum.year) var index = i;
             });
         that.uiState.selectedIndex = index;
 
