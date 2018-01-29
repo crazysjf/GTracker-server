@@ -72,8 +72,10 @@ def records(request):
     start_date = end_date - timedelta(date_range - 1)
     rs = db.get_records_with_shop_id_in_date_range(shop_id, start_date, end_date)
 
-    # {<good_id_1>: {sales_30: [d11, d12, ...],
+    # {
+    #  <good_id_1>: {sales_30: [d11, d12, ...], name: <good-name>, link: <link>},
     #  <good_id_2>: {sales_30: [d21, d22,...]}
+    # }
     result = {}
 
     for r in rs:
@@ -92,6 +94,8 @@ def records(request):
     for good_id in result.keys():
         good_data = result[good_id]
         good_data['sales'] = gen_diff(good_data['sales_30'])
+        gi = db.get_good_info(good_id)
+        good_data['name']  = gi[0] if gi != None else u'无'
 
     # _r = {}
     # for i,k in enumerate(result.keys()):

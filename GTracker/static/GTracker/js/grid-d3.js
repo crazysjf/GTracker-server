@@ -1,3 +1,52 @@
+
+/**
+ * 函数说明：获取字符串长度
+ * 备注：字符串实际长度，中文2，英文1
+ * @param:需要获得长度的字符串
+ */
+function getStrLength(str) {
+    var realLength = 0, len = str.length, charCode = -1;
+    for (var i = 0; i < len; i++) {
+        charCode = str.charCodeAt(i);
+        if (charCode >= 0 && charCode <= 128){
+            realLength += 1;
+        }else{
+            realLength += 2;
+        }
+    }
+    return realLength;
+}
+/**
+ * js截取字符串，中英文都能用
+ * @param str：需要截取的字符串
+ * @param len: 需要截取的长度
+ */
+function cutstr(str, len) {
+    var str_length = 0;
+    var str_len = 0;
+    str_cut = new String();
+    str_len = str.length;
+    for (var i = 0; i < str_len; i++) {
+        a = str.charAt(i);
+        str_length++;
+        if (escape(a).length > 4) {
+            //中文字符的长度经编码之后大于4
+            str_length++;
+        }
+        str_cut = str_cut.concat(a);
+        if (str_length >= len) {
+            str_cut = str_cut.concat("...");
+            return str_cut;
+        }
+    }
+    //如果给定字符串小于指定长度，则返回源字符串；
+    if (str_length < len) {
+        return str;
+    }
+}
+
+
+
 // Copyright 2013 Peter Cook @prcweb prcweb.co.uk
 var chart = {
 
@@ -22,11 +71,13 @@ var chart = {
     chartWidth: 300,
 
     hMargin: 30, // 表之间水平和垂直间隙
-    vMargin: 20,
+    vMargin: 40,
 
     columnNr: 4,
 
     dayRange: 30, // 时间范围30天
+
+    fontSize: 14,
 
     menu: [
         {'label': 'Year', 'sortBy': 'year'},
@@ -34,6 +85,7 @@ var chart = {
         {'label': 'Minimum', 'sortBy': 'min'},
         {'label': 'Mean', 'sortBy': 'mean'}
     ],
+
 
     uiState: {
         selectedIndex: 0,
@@ -50,6 +102,7 @@ var chart = {
         return 'translate(' + x + ',' + y + ')';
     },
 
+
     init: function () {
         var data = {};
 
@@ -57,11 +110,12 @@ var chart = {
             // var yearAve = _.reduce(data, function(m, v) {return m + v;}, 0) / 12;
             var max = _.max(data['sales']);
             var min = _.min(data['sales']);
-            return {good_id: k, sales: data['sales'], max: max, min: min};
+            return {good_id: k, sales: data['sales'], max: max, min: min, name: data['name']};
         });
         this.data = dataset
         this.initChart();
     },
+
 
     initChart: function () {
         var that = this;
@@ -72,7 +126,7 @@ var chart = {
 
         n = Math.ceil(this.data.length / 4)
         this.svgHeight = n * (this.chartHeight + this.vMargin * 2)
-        this.svgWidth = this.columnNr * (this.chartWidth + this.hMargin * 2)
+        this.svgWidth  = this.columnNr * (this.chartWidth + this.hMargin * 2)
 
         // YEAR LINES
         var goods = d3.select('#chart svg')
@@ -96,11 +150,13 @@ var chart = {
                 return that.translate(xOffset, yOffset);
             })
 
+
         function yScaleGen(min, max) {
             return d3.scale.linear()
                 .domain([min, max])
                 .range([that.chartHeight, 0]);
         }
+
 
         function svgLineGen(yScale) {
             //that = this
@@ -116,6 +172,7 @@ var chart = {
                     return yScale(d);
                 });
         }
+
 
         function drawOneChart(d, i) {
             t = d3.select(this) // this即为当前的元素。这个元素必须要做成一个selection才能够进行后面的操作。
@@ -143,19 +200,29 @@ var chart = {
                  .attr('d', function (d, i) {
                      return svgLineGen(yScale)(d.sales)
                  });
+            shortenedName = cutstr(d.name, Math.floor(that.chartWidth/that.fontSize)*2 - 2)
+            t.append('text')
+                .classed('good-name', true)
+                .attr('x',0)
+                .attr('y',that.chartHeight + that.fontSize + 2)
+                .attr('font-size', that.fontSize)
+                .text(shortenedName)
         }
 
         goods.each(drawOneChart)
     },
 
+
     updateSort: function (sortBy) {
         var that = this;
         this.uiState.sortBy = sortBy;
+
 
         // Do the sort
         var years = d3.select('#chart .years')
             .selectAll('g.year')
             .sort(this.sortFunction[this.uiState.sortBy]);
+
 
         // Persist the chosen year: get the index of the chosen year
         d3.selectAll('#chart .years g.year')
@@ -163,6 +230,7 @@ var chart = {
                 if (d.year === that.uiState.selectedDatum.year) index = i;
             });
         that.uiState.selectedIndex = index;
+
 
         // Transform the axes
         d3.selectAll('.axes')
@@ -172,6 +240,7 @@ var chart = {
             .each('end', function () {
                 that.uiState.sorting = false;
             });
+
 
         // Transform the year paths
         d3.selectAll('#chart .years .year')
