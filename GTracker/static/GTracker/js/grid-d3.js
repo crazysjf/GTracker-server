@@ -131,6 +131,9 @@ var chart = {
         this.svgWidth  = this.columnNr * (this.chartWidth + this.hMargin * 2)
 
         // YEAR LINES
+        d3.select('#chart svg').remove()
+        d3.select('#chart').append('svg')
+        
         var goods = d3.select('#chart svg')
             .attr('height', that.svgHeight + 'px')
             .attr('width', that.svgWidth + 'px')
@@ -262,12 +265,14 @@ var chart = {
     }
 }
 
+function genChart(shopId) {
+    d3.json("http://127.0.0.1:8000/GTracker/records/?shop_id=" + shopId, function (data) {
+        chart.data = data
+        chart.init();
+        //chart.updateVisibleYears();
+    })
+}
 
-d3.json('http://127.0.0.1:8000/GTracker/records/?shop_id=162545180', function (data) {
-    chart.data = data
-    chart.init();
-    //chart.updateVisibleYears();
-});
 
 $(document).ready(function(){
     $.get("api/need_log_in/",function(data,status){
@@ -276,5 +281,20 @@ $(document).ready(function(){
                 $("div#flash").html("" + data);
             })
         }
-    });
+    })
+
+    $("#shop-select").change(function(){
+        var opt = $("#shop-select  option:selected")[0]
+        //var shopName = sel.text();
+
+        // 如果选择空，则清空列表
+        if (opt.text == "") {
+            return
+        }
+
+        var shopId   = $(opt).attr('shop_id')
+        var shopLink = $(opt).attr('shop_link')
+        $("#enter-shop-button").attr({'href':shopLink})
+        genChart(shopId)
+    })
 })

@@ -2,6 +2,18 @@
 <div id="flash">
 
 </div>
+<div class="row">
+    <div class="col-8">
+        <span>店铺：</span>
+        <select name="" id="shop-select">
+            <option></option>
+            {% for s in shops %}
+            <option shop_id="{{s.1}}" shop_link="{{s.2}}">{{s.0}}</option>
+            {% endfor %}
+        </select>
+        <a id='enter-shop-button' href=# target="_blank">进入店铺</a>
+    </div>
+</div>
 
 <div id="chart">
     <svg>
