@@ -133,7 +133,7 @@ var chart = {
         // YEAR LINES
         d3.select('#chart svg').remove()
         d3.select('#chart').append('svg')
-        
+
         var goods = d3.select('#chart svg')
             .attr('height', that.svgHeight + 'px')
             .attr('width', that.svgWidth + 'px')
@@ -206,7 +206,11 @@ var chart = {
                      return svgLineGen(yScale)(d.sales)
                  });
             var shortenedName = cutstr(d.name, Math.floor(that.chartWidth/that.fontSize)*2 - 2)
-            t.append('text')
+
+            t.append('a').attr('xlink:href', 'http://item.taobao.com/item.htm?id=' + d.good_id)
+                .attr('target','new')
+
+            t.select('a').append('text')
                 .classed('good-name', true)
                 .attr('x',0)
                 .attr('y',that.chartHeight + that.fontSize + 2)
