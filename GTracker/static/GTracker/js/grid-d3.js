@@ -168,7 +168,10 @@ var chart = {
             return d3.svg.line()
                 .interpolate('cardinal')
                 .defined(function (d) {
-                    return d
+                    if (d == null)
+                        return false;
+                    else
+                        return true;
                 })
                 .x(function (d, i) {
                     return that.xScale(i);
