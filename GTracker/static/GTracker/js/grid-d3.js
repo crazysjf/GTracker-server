@@ -73,7 +73,7 @@ var chart = {
     chartWidth: 300,
 
     hMargin: 60, // 表之间水平和垂直间隙
-    vMargin: 40,
+    vMargin: 100,
 
     columnNr: 4,
 
@@ -112,7 +112,7 @@ var chart = {
             // var yearAve = _.reduce(data, function(m, v) {return m + v;}, 0) / 12;
             var max = _.max(data['sales']);
             var min = _.min(data['sales']);
-            return {good_id: k, sales: data['sales'], max: max, min: min, name: data['name']};
+            return {good_id: k, sales: data['sales'], max: max, min: min, name: data['name'], shop_name:data['shop_name'], create:data['create'], main_pic:data['main_pic']};
         });
         this.data = dataset
         this.initChart();
@@ -213,12 +213,35 @@ var chart = {
             t.append('a').attr('xlink:href', 'http://item.taobao.com/item.htm?id=' + d.good_id)
                 .attr('target','new')
 
+            var x_off = 60
+
             t.select('a').append('text')
                 .classed('good-name', true)
-                .attr('x',0)
+                .attr('x',x_off)
                 .attr('y',that.chartHeight + that.fontSize + 2)
                 .attr('font-size', that.fontSize)
                 .text(shortenedName)
+
+            t.append('text')
+                .classed('good-name', true)
+                .attr('x',x_off)
+                .attr('y',that.chartHeight + 2 * that.fontSize + 2)
+                .attr('font-size', that.fontSize)
+                .text(d.shop_name)
+            t.append('text')
+                .classed('good-name', true)
+                .attr('x',x_off)
+                .attr('y',that.chartHeight + 3 * that.fontSize + 2)
+                .attr('font-size', that.fontSize)
+                .text(d.create)
+
+            t.append('image')
+                .classed('good-name', true)
+                .attr('x', 0)
+                .attr('y', that.chartHeight)
+                .attr('height', '50px')
+                .attr('width', '50px')
+                .attr('xlink:href',  d.main_pic)
         }
 
         goods.each(drawOneChart)

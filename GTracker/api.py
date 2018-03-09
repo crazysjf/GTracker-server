@@ -74,8 +74,8 @@ def records(request):
 
     # result格式
     # {
-    #  <good_id_1>: {sales_30: [d11, d12, ...], name: <good-name>},
-    #  <good_id_2>: {sales_30: [d21, d22,...],  name: <good-name>}
+    #  <good_id_1>: {sales_30: [d11, d12, ...], name: <good-name>, main_pic:<主图>, shop_name:<店铺名称>, create:<创建时间>},
+    #  <good_id_2>: {sales_30: [d21, d22,...],  name: <good-name>, main_pic:<主图>, shop_name:<店铺名称>, create:<创建时间>}
     # }
     result = {}
 
@@ -90,6 +90,11 @@ def records(request):
         else:
             good_data['sales_30'] = [None] * (date_range + 1)
             good_data['name'] = good_name
+            g_info = db.get_good_info(good_id)
+            shop_name = db.get_shop_name(shop_id)
+            good_data['main_pic'] = g_info[3]
+            good_data['create'] = g_info[2].split()[0] # 只返回日期部分，不返回时间
+            good_data['shop_name'] = shop_name
             result[good_id] = good_data
         idx = (date - start_date).days
         good_data['sales_30'][idx] = sales_30

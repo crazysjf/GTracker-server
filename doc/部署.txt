@@ -1,3 +1,9 @@
+# 初始化数据库
+sqlite3 data.db
+命令行里面执行：
+.read DDL.sql
+退出
+
 # 运行运行redis服务器
 把配置文件中的daemonize设为yes
 运行redis-server
