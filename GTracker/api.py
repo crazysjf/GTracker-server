@@ -61,6 +61,45 @@ def gen_diff(a):
     return r
 
 
+def gen_diff2(a):
+    '''
+    版本2
+    计算数组a的差分并返回。
+    a中允许有None存在。如果a[i] == None, 则a[i] = a[i+1]
+    如果全部为None，则全部作为0.
+    返回数组的长度比a的长度小1。
+    假设返回值为r:
+
+    [1, 2, 3]    => [1, 1]
+    [1, None, 3] => [2, 0]
+    [None, 2, 3] => [0, 1]
+    [None, None, 3] => [0, 3]
+    [None, None, None] => [0, 0, 0]
+
+    '''
+    r = [None] * (len(a) - 1)
+
+    for i in range(len(a)-1, -1, -1):
+        if a[i] != None:
+            # 把后部为None的填充为最近的非None值
+            for j in range(i+1, len(a)):
+                a[j] = a[i]
+            break
+
+        if i == -1 and a[i] == None:
+            # 整个数组全部为None
+            for j in range(0, len(a)):
+                a[j] = 0
+
+    for i in range(len(a)-1, -1, -1):
+        if i != len(a) - 1 and a[i] == None:
+            a[i] = a[i + 1]
+
+    for i in range(1, len(a)):
+        r[i - 1] = a[i] - a[i - 1]
+    return r
+
+
 def records(request):
     global  date
     db = DB()
@@ -73,10 +112,10 @@ def records(request):
     rs = db.get_records_with_shop_id_in_date_range(shop_id, start_date, end_date)
 
     # result格式
-    # {
-    #  <good_id_1>: {sales_30: [d11, d12, ...], name: <good-name>, main_pic:<主图>, shop_name:<店铺名称>, create:<创建时间>},
-    #  <good_id_2>: {sales_30: [d21, d22,...],  name: <good-name>, main_pic:<主图>, shop_name:<店铺名称>, create:<创建时间>}
-    # }
+    # [
+    #  {gid: <good_id_1>, sales: [d11, d12, ...], name: <good-name>, main_pic:<主图>, shop_name:<店铺名称>, create:<创建时间>},
+    #  {gid: <good_id_2>, sales: [d21, d22,...],  name: <good-name>, main_pic:<主图>, shop_name:<店铺名称>, create:<创建时间>}
+    # ]
     result = {}
 
     for r in rs:
@@ -99,12 +138,22 @@ def records(request):
         idx = (date - start_date).days
         good_data['sales_30'][idx] = sales_30
 
+    _result = []
+
     for good_id in result.keys():
         good_data = result[good_id]
-        good_data['sales'] = gen_diff(good_data['sales_30'])
+        good_data['sales'] = gen_diff2(good_data['sales_30'])
         good_data.pop('sales_30')   # 无需30天销量
+        good_data['gid'] = good_id
+        _result.append(good_data)
 
-    return HttpResponse(json.dumps(result, cls=DjangoJSONEncoder), content_type="application/json")
+
+    # 排序
+    def sum_of_last_3_days(good):
+        sales = good['sales']
+        return sales[-1] + sales[-2] + sales[-3]
+    re = sorted(_result, key=sum_of_last_3_days, reverse=True)
+    return HttpResponse(json.dumps(re, cls=DjangoJSONEncoder), content_type="application/json")
 
 
 def need_log_in(request):
