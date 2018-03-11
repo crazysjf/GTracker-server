@@ -112,7 +112,7 @@ var chart = {
             // var yearAve = _.reduce(data, function(m, v) {return m + v;}, 0) / 12;
             var max = _.max(data['sales']);
             var min = _.min(data['sales']);
-            return {good_id: k, sales: data['sales'], max: max, min: min, name: data['name'], shop_name:data['shop_name'], create:data['create'], main_pic:data['main_pic']};
+            return {good_id: data['gid'], sales: data['sales'], max: max, min: min, name: data['name'], shop_name:data['shop_name'], create:data['create'], main_pic:data['main_pic']};
         });
         this.data = dataset
         this.initChart();
@@ -166,7 +166,7 @@ var chart = {
         function svgLineGen(yScale) {
             //that = this
             return d3.svg.line()
-                .interpolate('cardinal')
+                .interpolate('monotone')
                 .defined(function (d) {
                     if (d == null)
                         return false;
@@ -205,6 +205,7 @@ var chart = {
                 .call(yAxis)
 
             t.append('path')
+                .attr('stroke-width', 2)
                  .attr('d', function (d, i) {
                      return svgLineGen(yScale)(d.sales)
                  });

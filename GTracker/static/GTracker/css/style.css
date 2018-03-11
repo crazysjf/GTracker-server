@@ -120,8 +120,7 @@ svg {
 /* years */
 g.good path {
 	fill: none;
-	stroke: #333;
-	stroke-width: 1px;
+	stroke: #060668;
 }
 
 g.good line {
