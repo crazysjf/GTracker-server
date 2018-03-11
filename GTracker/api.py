@@ -107,8 +107,8 @@ def records(request):
 
     date_range = 30
     # 获取指定shop_id的30内所有记录
-    end_date = date.today()
-    start_date = end_date - timedelta(date_range - 1)
+    end_date = date.today() - timedelta(1) # 结束日期最多到昨天
+    start_date = end_date - timedelta(date_range)     # 包括start_date和end_date在内共date_range + 1天
     rs = db.get_records_with_shop_id_in_date_range(shop_id, start_date, end_date)
 
     # result格式
@@ -153,6 +153,12 @@ def records(request):
         sales = good['sales']
         return sales[-1] + sales[-2] + sales[-3]
     re = sorted(_result, key=sum_of_last_3_days, reverse=True)
+
+    # debug
+    for r in re:
+        if r['gid'] == '546849050764':
+            print r
+
     return HttpResponse(json.dumps(re, cls=DjangoJSONEncoder), content_type="application/json")
 
 
