@@ -86,7 +86,7 @@ def gen_diff2(a):
                 a[j] = a[i]
             break
 
-        if i == -1 and a[i] == None:
+        if i == 0 and a[i] == None:
             # 整个数组全部为None
             for j in range(0, len(a)):
                 a[j] = 0
@@ -96,6 +96,8 @@ def gen_diff2(a):
             a[i] = a[i + 1]
 
     for i in range(1, len(a)):
+        # if a[i] == None and a[i-1] == None:
+        #     print r
         r[i - 1] = a[i] - a[i - 1]
     return r
 
@@ -121,13 +123,13 @@ def records(request):
     for r in rs:
         good_id     = r[0]
         date        = datetime.strptime(r[1],'%Y-%m-%d').date()
-        sales_30    = r[2]
+        bid30    = r[2]
         good_name   = r[3]
         good_data = {}
         if result.has_key(good_id):
             good_data = result[good_id]
         else:
-            good_data['sales_30'] = [None] * (date_range + 1)
+            good_data['bid30'] = [None] * (date_range + 1)
             good_data['name'] = good_name
             g_info = db.get_good_info(good_id)
             shop_name = db.get_shop_name(shop_id)
@@ -136,14 +138,14 @@ def records(request):
             good_data['shop_name'] = shop_name
             result[good_id] = good_data
         idx = (date - start_date).days
-        good_data['sales_30'][idx] = sales_30
+        good_data['bid30'][idx] = bid30
 
     _result = []
 
     for good_id in result.keys():
         good_data = result[good_id]
-        good_data['sales'] = gen_diff2(good_data['sales_30'])
-        good_data.pop('sales_30')   # 无需30天销量
+        good_data['sales'] = gen_diff2(good_data['bid30'])
+        good_data.pop('bid30')   # 无需30天销量
         good_data['gid'] = good_id
         _result.append(good_data)
 
