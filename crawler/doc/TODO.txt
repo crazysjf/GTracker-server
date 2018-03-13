@@ -1,0 +1,10 @@
+# 2018-03-13
+ - 统一名词：
+   - creation_time, creation_date => create
+   - sales, bid
+   - good_id, shop_id => gid, sid
+   - title, name
+
+ - 实现全店铺的排序和分页
+ - 坐标轴和颜色改进，考虑商品创建时间
+ - 增加排序方法：销新比，3天销量和，7天销量和，创建时间

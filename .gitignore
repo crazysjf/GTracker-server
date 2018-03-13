@@ -2,3 +2,6 @@
 *.sqlite3
 *.pyc
 collectedstatic/
+*.csv
+*.db
+.DS_Store

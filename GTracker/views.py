@@ -4,9 +4,8 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.http import HttpResponse
 import sys
-db_path = "../GTracker-crawler/"
-sys.path.append(db_path)
-from db.db import DB
+
+from crawler.db.db import DB
 
 # Create your views here.
 def perspective(request):
