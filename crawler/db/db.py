@@ -93,10 +93,20 @@ class DB(Singleton):
         r = self.cur.fetchone()
         return r
 
+    def get_goods(self, shop_id=None):
+        sql = 'select goodid from goods where active=1'
+        if shop_id != None:
+            sql = sql + " and ShopId=%s" % shop_id
+        self.cur.execute(sql)
+        r = self.cur.fetchall()
+        return r
+
+
     def get_all_goods_with_empty_main_pic(self):
         self.cur.execute('select goodid from goods where mainpic isNull')
         r = self.cur.fetchall()
         return r
+
 
     def good_update_main_pic(self, good_id, main_pic):
         self.cur.execute('update goods set mainPic=? where goodId=?', (main_pic, good_id))
@@ -106,10 +116,10 @@ class DB(Singleton):
     def insert_good(self, good):
         '''
         插入商品
-        :param good: 格式：(GoodId, ShopId, Name, CreationDate，MainPic, SumSales3, SumSales7, SNR)
+        :param good: 格式：(GoodId, ShopId, Name, CreationDate，MainPic)
         :return: 
         '''
-        self.cur.execute("INSERT INTO Goods(GoodId, ShopId, Name, CreationDate, MainPic, SumSales3, SumSales7, SNR, active) VALUES(?,?,?,?,?,?,?,?,?)",
+        self.cur.execute("INSERT INTO Goods(GoodId, ShopId, Name, CreationDate, MainPic, active) VALUES(?,?,?,?,?,?)",
                          good + (1,))
 
     def record_exists(self, good_id, date):
@@ -240,70 +250,66 @@ class DB(Singleton):
             # 重复数据不用每次判断，直接插入，可以大幅提高性能
             # 如果重复会抛出IntegrityError异常，直接忽略即可。
             try:
-                r = self.calc_indexes_for_good(d['good_id'])
-                g = (d['good_id'], shop_id, d['title'], d['creation_time'],d['main_pic'], r['sum_sales_3'], r['sum_sales_7'], r['snr'])
+                #r = self.calc_indexes_for_good(d['good_id'])
+                g = (d['good_id'], shop_id, d['title'], d['creation_time'],d['main_pic'])
 
-                self.cur.execute("update goods set name=?, creationDate=?, mainPic=?, SumSales3=?, SumSales7=?, SNR=?, active=1 where goodid=?",
+                self.cur.execute("update goods set name=?, creationDate=?, mainPic=?, active=1 where goodid=?",
                                  g[2:]+ (g[0],)) # 如果商品存在则更新active，不存在无效果
-                #(GoodId, ShopId, Name, CreationDate，MainPic, SumSales3, SumSales7, SNR)
+                #(GoodId, ShopId, Name, CreationDate，MainPic)
                 self.insert_good(g) # 如果商品存在进入抛出异常，不存在进行插入
             except lite.IntegrityError as e:
                 pass
 
-    def calc_indexes_for_good(self, gid):
+    def update_params_for_goods(self, shop_id = None):
         '''
-        计算商品的各个指标。
+        更新所有商品的各个指标。
+        如果指定了shop_id，则仅更新指定shop的商品
         返回：{sum_sales_7: 7天销量和， sum_sales_3: 3天销量和， snr: 销新比'}
         '''
-        date_range = 8  # 取出近8天数据
-        start_date = date.today() - timedelta(date_range)
-        end_date = date.today() - timedelta(1)
-        rs = self.get_records_with_good_id_in_date_range(gid, start_date, end_date)
+        gids = self.get_goods(shop_id)
+        total = len(gids)
+        cnt = 0
+        print "begin to update indexes for %d goods..." % total
+        for _gid in gids:
+            gid = _gid[0] #_gid是一个tuple
 
+            date_range = 8  # 取出近8天数据
+            start_date = date.today() - timedelta(date_range)
+            end_date = date.today() - timedelta(1)
+            rs = self.get_records_with_good_id_in_date_range(gid, start_date, end_date)
+            #rs = [(str(date.today() - timedelta(8-i)), i) for i in range(0, 8)]
 
-        a = [None] * date_range
-        for r in rs:
-            idx = (str_2_date(r[0]) - start_date).days
-            a[idx] = r[1]
-        diff = gen_diff2(a)
-        r = {}
-        r['sum_sales_7'] = diff[0] + diff[1] + diff[2] + diff[3] + diff[4] + diff[5] + diff[6]
-        r['sum_sales_3'] = diff[4] + diff[5] + diff[6]
+            a = [None] * date_range
+            for r in rs:
+                idx = (str_2_date(r[0]) - start_date).days
+                a[idx] = r[1]
+            diff = gen_diff2(a)
+            sum_sales_7 = diff[0] + diff[1] + diff[2] + diff[3] + diff[4] + diff[5] + diff[6]
+            sum_sales_3 = diff[4] + diff[5] + diff[6]
 
-        # 从返回的结果中找出最后一天的30天销量
-        latest_bid_30 = 0
-        t = filter(lambda x: str_2_date(x[0]) == end_date, rs)
-        if len(t) != 0:
-            latest_bid30 = t[0][1]
-        # 商品的创建时间
-        create = self.get_good_info(gid)[2]
-        days =  (end_date - str_2_date(create.split()[0])).days
-        if days <= 0:
-            days = 1 # +1避免出现除0错误，有时候days算出来为负数，原因不明
+            # 从返回的结果中找出最后一天的30天销量
+            latest_bid_30 = 0
+            t = filter(lambda x: str_2_date(x[0]) == end_date, rs)
+            if len(t) != 0:
+                latest_bid30 = t[0][1]
+            # 商品的创建时间
+            create = self.get_good_info(gid)[2]
+            days =  (end_date - str_2_date(create.split()[0])).days
+            if days <= 0:
+                days = 1 # +1避免出现除0错误，有时候days算出来为负数，原因不明
 
-        r['snr']    = float(latest_bid30) / days
-        return r
+            snr = float(latest_bid30) / days
+
+            self.cur.execute("update Goods set SumSales7=?, SumSales3=?, snr=? where GoodId=?",
+                             (sum_sales_7, sum_sales_3, snr, gid))
+            cnt = cnt + 1
+            print "updated %s, %d, %d\%%" % (gid, cnt, float(cnt*100)/total)
+
+        self.commit()
+        print "finished updating indexes ..."
 
 
 if __name__ == '__main__':
     db = DB()
-    date_range = 8 # 取出近8天数据
-    start_date = date.today() - timedelta(date_range)
-    end_date = date.today() - timedelta(1)
-    gid = '546849050764'
-    rs = db.get_records_with_good_id_in_date_range(gid, start_date, end_date)
-
-    delta = end_date - start_date
-    a = [None] * date_range
-    for r in rs:
-        idx = (str_2_date(r[0]) - start_date).days
-        a[idx] = r[1]
-
-    print a
-    diff = gen_diff2(a)
-    print diff
-    latest_bid30 = filter(lambda x: str_2_date(x[0]) == end_date, rs)[0][1]
-    print latest_bid30
-    create = db.get_good_info(gid)[2]
-    print create
-    print end_date - str_2_date(create.split()[0])
+    gids = db.get_all_active_goods()
+    print gids
