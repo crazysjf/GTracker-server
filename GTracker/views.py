@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.http import HttpResponse
 import sys
+from pypinyin import lazy_pinyin
 
 from crawler.db.db import DB
 
@@ -19,7 +20,10 @@ def grid(request):
     # except TimeoutError:
     db = DB()
     shops = db.get_all_shops()
-    return render(request, 'GTracker/grid.html', {'shops': shops})
+    # 用拼音排序
+    _shops = sorted(shops, key=lambda s:lazy_pinyin(s[0]))
+    return render(request, 'GTracker/grid.html', {'shops': _shops})
 
 def others(request):
     return render(request, 'GTracker/others.html')
+

@@ -70,7 +70,7 @@ class DB(Singleton):
 
 
     def get_all_shops(self):
-        self.cur.execute("SELECT name, shopid, link FROM Shops where active=1")
+        self.cur.execute("SELECT name, shopid FROM Shops where active=1")
         rows = self.cur.fetchall()
 
         return rows

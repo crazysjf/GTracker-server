@@ -324,7 +324,7 @@ $(document).ready(function(){
         }
 
         var shopId   = $(opt).attr('shop_id')
-        var shopLink = $(opt).attr('shop_link')
+        var shopLink = 'https://shop' + shopId + ".taobao.com"
         $("#enter-shop-button").attr({'href':shopLink})
         genChart(shopId)
     })
