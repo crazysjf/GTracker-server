@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from crawler.misc import constants
 import os
 from common.utils import gen_diff2, str_2_date
+from enum import Enum
 
 dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,6 +19,11 @@ class Singleton(object):
             cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)
         return cls._instance
 
+# 排序方法
+class SortMethod(Enum):
+    BY_SUM_SALES_3 = 1
+    BY_SUM_SALES_7 = 2
+    BY_SNR = 3
 
 class DB(Singleton):
     '''
@@ -26,10 +32,9 @@ class DB(Singleton):
     用db操作
     db.commit() # 需要提交时调用
     db.finish() # 需要显式关闭数据库时使用
-
-
     '''
     db_name = os.path.join(dir, "data.db")
+
 
     def __init__(self, db = None):
         '''初始化
@@ -93,10 +98,19 @@ class DB(Singleton):
         r = self.cur.fetchone()
         return r
 
-    def get_goods(self, shop_id=None):
-        sql = 'select goodid from goods where active=1'
+    def get_goods(self, shop_id = None, sort=SortMethod.BY_SNR):
+        sql = 'select goodid, Name, MainPic, CreationDate from goods where active=1'
         if shop_id != None:
             sql = sql + " and ShopId=%s" % shop_id
+
+        order_by = "SNR"
+        if sort == SortMethod.BY_SUM_SALES_3:
+            order_by = 'SumSales3'
+        elif sort == SortMethod.BY_SUM_SALES_7:
+            order_by = 'SumSales7'
+
+        sql = sql + " order by " + order_by + " DESC"
+
         self.cur.execute(sql)
         r = self.cur.fetchall()
         return r
@@ -277,7 +291,6 @@ class DB(Singleton):
             start_date = date.today() - timedelta(date_range)
             end_date = date.today() - timedelta(1)
             rs = self.get_records_with_good_id_in_date_range(gid, start_date, end_date)
-            #rs = [(str(date.today() - timedelta(8-i)), i) for i in range(0, 8)]
 
             a = [None] * date_range
             for r in rs:
