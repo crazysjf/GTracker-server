@@ -133,7 +133,16 @@ class DB(Singleton):
         r = self.cur.fetchone()
         return r
 
-    def get_goods(self, shop_id = None, sort=SortMethod.BY_SNR):
+    def get_goods_nr(self, shop_id = None):
+        sql = 'select count(*) from goods where active=1'
+        if shop_id != None:
+            sql = sql + " and ShopId=%s" % shop_id
+        self.cur.execute(sql)
+        r = self.cur.fetchall()
+        return r[0][0]
+
+
+    def get_goods(self, shop_id = None, sort=SortMethod.BY_SNR, offset=0, limit=None):
         sql = 'select goodid, Name, MainPic, CreationDate from goods where active=1'
         if shop_id != None:
             sql = sql + " and ShopId=%s" % shop_id
@@ -147,6 +156,8 @@ class DB(Singleton):
         order_by = order_by_dict[sort]
 
         sql = sql + " order by " + order_by + " DESC"
+        if limit != None:
+            sql = sql + " limit " + limit + ' offset ' + offset
 
         self.cur.execute(sql)
         r = self.cur.fetchall()
@@ -363,4 +374,4 @@ if __name__ == '__main__':
     # db = DB()
     # gids = db.get_all_active_goods()
     # print gids
-    print SortMethod.param_str(SortMethod.BY_SUM_SALES_7)
+    print DB().get_goods_nr('33495993')

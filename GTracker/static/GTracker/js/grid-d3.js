@@ -297,24 +297,61 @@ var chart = {
 }
 
 function genChart(shopId, sort) {
-    d3.json("http://127.0.0.1:8000/GTracker/records/?shop_id=" + shopId + "&sort=" + sort, function (data) {
-        chart.data = data
-        chart.init();
+    d3.json("http://127.0.0.1:8000/GTracker/goods_nr/?shop_id=" + shopId + "&sort=" + sort, function (data) {
+        init_pagination(data['goods_nr'])
     })
+}
+
+function init_pagination(eleNr) {
+    $(".pagination").paging(eleNr, {
+        perpage: 200,
+        format: '[< ncnnn >]',
+        onSelect: function (page) {
+            var shop_id = get_shop_id()
+            var sort_method = get_sort_method()
+            var offset = this.slice[0]
+            var limit  = this.slice[1] - this.slice[0]
+            d3.json("http://127.0.0.1:8000/GTracker/records/?shop_id=" + shop_id + "&sort=" + sort_method + "&offset=" + offset + "&limit=" + limit , function (data) {
+                chart.data = data
+                chart.init();
+            })
+            return false
+        },
+        onFormat: function (type) {
+            switch (type) {
+                case 'block': // n and c
+                    if (!this.active)
+                        return '<span class="disabled">' + this.value + '</span>';
+                    else if (this.value != this.page)
+                        return '<a href="#' + this.value + '">' + this.value + '</a>';
+                    return '<span class="current">' + this.value + '</span>';
+
+                case 'next': // >
+                    return '<a>&gt;</a>';
+                case 'prev': // <
+                    return '<a>&lt;</a>';
+                case 'first': // [
+                    return '<a>|<</a>';
+                case 'last': // ]
+                    return '<a>>|<a>';
+            }
+        }
+    });
+}
+
+function get_shop_id() {
+    var shopId  = $($("#shop-select  option:selected")[0]).attr('shop_id')
+    return shopId
+}
+
+function get_sort_method() {
+    var sort = $($("#sort-select  option:selected")[0]).attr('param_str')
+    return sort
 }
 
 
 $(document).ready(function() {
 
-    function get_shop_id() {
-        var shopId  = $($("#shop-select  option:selected")[0]).attr('shop_id')
-        return shopId
-    }
-
-    function get_sort_method() {
-        var sort = $($("#sort-select  option:selected")[0]).attr('param_str')
-        return sort
-    }
 
     $("#shop-select").change(function () {
         var opt = $("#shop-select  option:selected")[0]
@@ -337,4 +374,5 @@ $(document).ready(function() {
         var sort = get_sort_method()
         genChart(shopId, sort)
     })
+
 })
