@@ -20,10 +20,45 @@ class Singleton(object):
         return cls._instance
 
 # 排序方法
-class SortMethod(Enum):
-    BY_SUM_SALES_3 = 1
-    BY_SUM_SALES_7 = 2
-    BY_SNR = 3
+class SortMethod:
+    BY_SUM_SALES_3  = 1
+    BY_SUM_SALES_7  = 2
+    BY_SNR          = 3
+    BY_CREATE       = 4
+
+    param_str_dict = {
+        BY_SUM_SALES_3: ["SumSales3",   '最近3天销量'],
+        BY_SUM_SALES_7: ["SumSales7",   '最近7天销量'],
+        BY_SNR:         ["snr",         '销新比'],
+        BY_CREATE:      ["create",      '创建时间']
+    }
+
+
+    @staticmethod
+    def desc(p):
+        '''中文描述'''
+        return SortMethod.param_str_dict[p][1]
+
+
+    @staticmethod
+    def param_str(s):
+        '''转为http请求用的参数字符串'''
+        return SortMethod.param_str_dict[s][0]
+
+
+    @staticmethod
+    def param_str_2_sort_method(s):
+        '''参数字符串转SortMethod'''
+        for k in SortMethod.param_str_dict.keys():
+            if SortMethod.param_str_dict[k][0] == s:
+                return k
+        return None
+
+
+    @staticmethod
+    def all():
+        return SortMethod.param_str_dict.keys()
+
 
 class DB(Singleton):
     '''
@@ -103,11 +138,13 @@ class DB(Singleton):
         if shop_id != None:
             sql = sql + " and ShopId=%s" % shop_id
 
-        order_by = "SNR"
-        if sort == SortMethod.BY_SUM_SALES_3:
-            order_by = 'SumSales3'
-        elif sort == SortMethod.BY_SUM_SALES_7:
-            order_by = 'SumSales7'
+        order_by_dict = {
+            SortMethod.BY_SUM_SALES_3:'SumSales3',
+            SortMethod.BY_SUM_SALES_7:'SumSales7',
+            SortMethod.BY_SNR: "SNR",
+            SortMethod.BY_CREATE:"CreationDate"
+        }
+        order_by = order_by_dict[sort]
 
         sql = sql + " order by " + order_by + " DESC"
 
@@ -323,6 +360,7 @@ class DB(Singleton):
 
 
 if __name__ == '__main__':
-    db = DB()
-    gids = db.get_all_active_goods()
-    print gids
+    # db = DB()
+    # gids = db.get_all_active_goods()
+    # print gids
+    print SortMethod.param_str(SortMethod.BY_SUM_SALES_7)

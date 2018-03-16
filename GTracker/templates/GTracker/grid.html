@@ -17,7 +17,8 @@
             <span>排序：</span>
             <select name="" id="sort-select">
                 <option></option>
-                {% for s in shops %}
+                {% for s in sort_methods %}
+                <option param_str="{{s.0}}" {% if s.0 == "SumSales3" %} selected="selected" {% endif %}>{{s.1}}</option>
                 {% endfor %}
             </select>
 

@@ -6,7 +6,7 @@ from django.http import HttpResponse
 import sys
 from pypinyin import lazy_pinyin
 
-from crawler.db.db import DB
+from crawler.db.db import DB, SortMethod
 
 # Create your views here.
 def perspective(request):
@@ -22,7 +22,9 @@ def grid(request):
     shops = db.get_all_shops()
     # 用拼音排序
     _shops = sorted(shops, key=lambda s:lazy_pinyin(s[0]))
-    return render(request, 'GTracker/grid.html', {'shops': _shops})
+
+    sort_methods = [(SortMethod.param_str(_), SortMethod.desc(_)) for _ in SortMethod.all()]
+    return render(request, 'GTracker/grid.html', {'shops': _shops, 'sort_methods': sort_methods})
 
 def others(request):
     return render(request, 'GTracker/others.html')

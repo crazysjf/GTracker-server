@@ -296,36 +296,45 @@ var chart = {
     }
 }
 
-function genChart(shopId) {
-    d3.json("http://127.0.0.1:8000/GTracker/records/?shop_id=" + shopId, function (data) {
+function genChart(shopId, sort) {
+    d3.json("http://127.0.0.1:8000/GTracker/records/?shop_id=" + shopId + "&sort=" + sort, function (data) {
         chart.data = data
         chart.init();
-        //chart.updateVisibleYears();
     })
 }
 
 
-$(document).ready(function(){
-    $.get("api/need_log_in/",function(data,status){
-        if (data == true) {
-            $.get("api/log_in_frag/", function (data) {
-                $("div#flash").html("" + data);
-            })
-        }
-    })
+$(document).ready(function() {
 
-    $("#shop-select").change(function(){
+    function get_shop_id() {
+        var shopId  = $($("#shop-select  option:selected")[0]).attr('shop_id')
+        return shopId
+    }
+
+    function get_sort_method() {
+        var sort = $($("#sort-select  option:selected")[0]).attr('param_str')
+        return sort
+    }
+
+    $("#shop-select").change(function () {
         var opt = $("#shop-select  option:selected")[0]
-        //var shopName = sel.text();
 
         // 如果选择空，则清空列表
         if (opt.text == "") {
             return
         }
 
-        var shopId   = $(opt).attr('shop_id')
+        var shopId = get_shop_id()
         var shopLink = 'https://shop' + shopId + ".taobao.com"
-        $("#enter-shop-button").attr({'href':shopLink})
-        genChart(shopId)
+        $("#enter-shop-button").attr({'href': shopLink})
+
+        var sort = get_sort_method()
+        genChart(shopId, sort)
+    })
+
+    $("#sort-select").change(function () {
+        var shopId = get_shop_id()
+        var sort = get_sort_method()
+        genChart(shopId, sort)
     })
 })

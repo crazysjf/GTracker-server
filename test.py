@@ -1,5 +1,5 @@
 from celery import Celery
-from crawler.db.db import DB
+from crawler.db.db import DB, SortMethod
 from pypinyin import lazy_pinyin
 # db = DB()
 # shops = db.get_all_shops()
@@ -7,10 +7,8 @@ from pypinyin import lazy_pinyin
 
 #print _shop
 
+sort_methods = [(_.param_str(), _.desc()) for _ in list(SortMethod)]
 
-from enum import Enum
-class SortMethod(Enum):
-    BY_SUM_SALES_3  = 1
-    BY_SUM_SALES_7  = 2
-    BY_SNR          = 3
+print sort_methods
 
+print SortMethod.BY_SUM_SALES_7.param_str()

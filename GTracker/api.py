@@ -82,18 +82,14 @@ def records(request):
     global date
     db = DB()
     shop_id = request.GET.get('shop_id', "")
-    sort_method = request.GET.get('sort', "SumSales3")
+    sm_str = request.GET.get('sort', "SumSales3")
 
     date_range = 30
     # 获取指定shop_id的30内所有记录
     end_date = date.today() - timedelta(1)  # 结束日期最多到昨天
     start_date = end_date - timedelta(date_range)  # 包括start_date和end_date在内共date_range + 1天
 
-    sm = SortMethod.BY_SNR
-    if sort_method == "SumSales3":
-        sm = SortMethod.BY_SUM_SALES_3
-    elif sort_method == "SumSales7":
-        sm = SortMethod.BY_SUM_SALES_7
+    sm = SortMethod.param_str_2_sort_method(sm_str)
 
     goods = db.get_goods(shop_id, sm)
     shop_name = db.get_shop_name(shop_id)

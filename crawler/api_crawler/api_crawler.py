@@ -125,8 +125,8 @@ if __name__ == "__main__":
     # _update_one_shop('110880913', date.today()-timedelta(1))
     # DB().update_indexes_for_goods(shop_id='110880913')
 
-    #update_and_crawl_one_day()
+    update_and_crawl_one_day()
     #update_and_crawl_last_week()
     # update_all_need_to()
-    DB().update_params_for_goods()
+    #DB().update_params_for_goods()
     #print gen_items_url('110880913', '2018-03-11')
