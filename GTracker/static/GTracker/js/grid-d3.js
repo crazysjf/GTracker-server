@@ -209,37 +209,40 @@ var chart = {
                  .attr('d', function (d, i) {
                      return svgLineGen(yScale)(d.sales)
                  });
-            var shortenedName = cutstr(d.name, Math.floor(that.chartWidth/that.fontSize)*2 - 2)
+
+            var x_off = 60
+            var y_margin = 4
+
+            var shortenedName = cutstr(d.name, Math.floor((that.chartWidth - 50)/that.fontSize)*2 - 2)
 
             t.append('a').attr('xlink:href', 'http://item.taobao.com/item.htm?id=' + d.good_id)
                 .attr('target','new')
 
-            var x_off = 60
 
             t.select('a').append('text')
                 .classed('good-name', true)
                 .attr('x',x_off)
-                .attr('y',that.chartHeight + that.fontSize + 2)
+                .attr('y',that.chartHeight + that.fontSize + y_margin)
                 .attr('font-size', that.fontSize)
                 .text(shortenedName)
 
             t.append('text')
-                .classed('good-name', true)
+                .classed('shop-name', true)
                 .attr('x',x_off)
-                .attr('y',that.chartHeight + 2 * that.fontSize + 2)
+                .attr('y',that.chartHeight + 2 * (that.fontSize + y_margin))
                 .attr('font-size', that.fontSize)
                 .text(d.shop_name)
             t.append('text')
-                .classed('good-name', true)
+                .classed('create', true)
                 .attr('x',x_off)
-                .attr('y',that.chartHeight + 3 * that.fontSize + 2)
+                .attr('y',that.chartHeight + 3 * (that.fontSize + y_margin))
                 .attr('font-size', that.fontSize)
                 .text(d.create)
 
             t.append('image')
                 .classed('good-name', true)
                 .attr('x', 0)
-                .attr('y', that.chartHeight)
+                .attr('y', that.chartHeight + y_margin)
                 .attr('height', '50px')
                 .attr('width', '50px')
                 .attr('xlink:href',  d.main_pic)

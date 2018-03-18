@@ -117,8 +117,18 @@ svg {
 	fill: #666;
 }
 
+g.good text.good-name {
+}
 
-/* years */
+g.good text.shop-name {
+    stroke:#666666;
+}
+
+g.good text.create {
+    stroke:#bbbbbb;
+}
+
+
 g.good path {
 	fill: none;
 	stroke: #060668;
