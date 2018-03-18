@@ -143,7 +143,7 @@ class DB(Singleton):
 
 
     def get_goods(self, shop_id = None, sort=SortMethod.BY_SNR, offset=0, limit=None):
-        sql = 'select goodid, Name, MainPic, CreationDate from goods where active=1'
+        sql = 'select goodid, Name, MainPic, CreationDate, ShopId from goods where active=1'
         if shop_id != None:
             sql = sql + " and ShopId=%s" % shop_id
 

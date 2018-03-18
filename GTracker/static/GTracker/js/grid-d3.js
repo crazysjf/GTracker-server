@@ -296,11 +296,6 @@ var chart = {
     }
 }
 
-function genChart(shopId, sort) {
-    d3.json("http://127.0.0.1:8000/GTracker/goods_nr/?shop_id=" + shopId + "&sort=" + sort, function (data) {
-        init_pagination(data['goods_nr'])
-    })
-}
 
 function init_pagination(eleNr) {
     $(".pagination").paging(eleNr, {
@@ -341,6 +336,8 @@ function init_pagination(eleNr) {
 
 function get_shop_id() {
     var shopId  = $($("#shop-select  option:selected")[0]).attr('shop_id')
+    if (typeof(shopId) == "undefined")
+        shopId = null
     return shopId
 }
 
@@ -349,6 +346,14 @@ function get_sort_method() {
     return sort
 }
 
+function genChart() {
+    var shopId = get_shop_id()
+    var sort = get_sort_method()
+
+    d3.json("http://127.0.0.1:8000/GTracker/goods_nr/?shop_id=" + shopId + "&sort=" + sort, function (data) {
+        init_pagination(data['goods_nr'])
+    })
+}
 
 $(document).ready(function() {
 
@@ -356,23 +361,15 @@ $(document).ready(function() {
     $("#shop-select").change(function () {
         var opt = $("#shop-select  option:selected")[0]
 
-        // 如果选择空，则清空列表
-        if (opt.text == "") {
-            return
-        }
-
         var shopId = get_shop_id()
         var shopLink = 'https://shop' + shopId + ".taobao.com"
         $("#enter-shop-button").attr({'href': shopLink})
-
-        var sort = get_sort_method()
-        genChart(shopId, sort)
+        genChart()
     })
 
     $("#sort-select").change(function () {
-        var shopId = get_shop_id()
-        var sort = get_sort_method()
-        genChart(shopId, sort)
+        genChart()
     })
 
+    genChart()
 })

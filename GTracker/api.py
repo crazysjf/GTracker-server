@@ -18,6 +18,8 @@ def goods_nr(request):
     global date
     db = DB()
     shop_id = request.GET.get('shop_id', "")
+    if shop_id == 'null':
+        shop_id = None
     goods_nr = db.get_goods_nr(shop_id)
     return HttpResponse(json.dumps({'goods_nr': goods_nr}, cls=DjangoJSONEncoder), content_type="application/json")
 
@@ -26,6 +28,8 @@ def records(request):
     global date
     db = DB()
     shop_id = request.GET.get('shop_id', "")
+    if shop_id == 'null':
+        shop_id = None
     sm_str = request.GET.get('sort', "SumSales3")
     offset = request.GET.get('offset', 0)
     limit = request.GET.get('limit', 200)
@@ -36,11 +40,7 @@ def records(request):
     start_date = end_date - timedelta(date_range)  # 包括start_date和end_date在内共date_range + 1天
 
     sm = SortMethod.param_str_2_sort_method(sm_str)
-
     goods = db.get_goods(shop_id, sm, offset, limit)
-    shop_name = db.get_shop_name(shop_id)
-
-
 
     # result格式
     # [
@@ -65,6 +65,8 @@ def records(request):
         d['main_pic']   = g[2]
         d['create']     = g[3]
         d['sales']      = sales
+        shop_id = g[4]
+        shop_name = db.get_shop_name(shop_id)
         d['shop_name']  = shop_name
         result.append(d)
 
