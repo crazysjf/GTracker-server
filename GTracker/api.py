@@ -58,12 +58,21 @@ def records(request):
             a[idx] = r[1]
 
         sales = gen_diff(a)
+        create = g[3]
+
+        # 如果创建时间早于第一个有效数据点，则一个有效数据点无效，防止中途采集的数据的第一个点显示为非常大的数值
+        for i in range(0, len(sales)):
+            if sales[i] != None:
+                date = start_date + timedelta(i)
+                if date > str_2_date(create):
+                    sales[i] = 0
+                break
 
         d = {}
         d['gid']        = gid
         d['name']       = g[1]
         d['main_pic']   = g[2]
-        d['create']     = g[3]
+        d['create']     = create
         d['sales']      = sales
         shop_id = g[4]
         shop_name = db.get_shop_name(shop_id)

@@ -218,7 +218,6 @@ var chart = {
             t.append('a').attr('xlink:href', 'http://item.taobao.com/item.htm?id=' + d.good_id)
                 .attr('target','new')
 
-
             t.select('a').append('text')
                 .classed('good-name', true)
                 .attr('x',x_off)

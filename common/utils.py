@@ -77,4 +77,5 @@ def str_2_date(s):
     :param s:
     :return:
     '''
-    return datetime.strptime(s, '%Y-%m-%d').date()
+    _s = s.split()[0] # 处理"2018-03-21 18:23:33"之类的带时间的参数
+    return datetime.strptime(_s, '%Y-%m-%d').date()
