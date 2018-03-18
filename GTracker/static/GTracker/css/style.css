@@ -97,6 +97,7 @@ p.item {
 
 /* SVG styling */
 svg {
+	margin: 20px;
 	font-family: helvetica, sans-serif;
 }
 

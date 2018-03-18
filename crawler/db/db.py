@@ -3,7 +3,7 @@ import sqlite3 as lite
 from datetime import date, timedelta
 from crawler.misc import constants
 import os
-from common.utils import gen_diff2, str_2_date
+from common.utils import gen_diff, str_2_date
 from enum import Enum
 
 dir = os.path.dirname(os.path.abspath(__file__))
@@ -344,7 +344,9 @@ class DB(Singleton):
             for r in rs:
                 idx = (str_2_date(r[0]) - start_date).days
                 a[idx] = r[1]
-            diff = gen_diff2(a)
+            _diff = gen_diff(a)
+            diff = map(lambda x: x if x!=None else 0, _diff) # 把None替换为0
+
             sum_sales_7 = diff[0] + diff[1] + diff[2] + diff[3] + diff[4] + diff[5] + diff[6]
             sum_sales_3 = diff[4] + diff[5] + diff[6]
 

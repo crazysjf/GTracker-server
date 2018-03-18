@@ -12,7 +12,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from datetime import date, datetime, timedelta
 from crawler.network.dzt_crawler import DztCrawler as Crawler
 from django.template.loader import render_to_string
-from common.utils import gen_diff2, str_2_date
+from common.utils import gen_diff, str_2_date
 
 def goods_nr(request):
     global date
@@ -57,7 +57,7 @@ def records(request):
             idx = (str_2_date(r[0]) - start_date).days
             a[idx] = r[1]
 
-        sales = gen_diff2(a)
+        sales = gen_diff(a)
 
         d = {}
         d['gid']        = gid

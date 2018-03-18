@@ -72,7 +72,7 @@ var chart = {
     chartHeight: 100,   // 单个表宽高
     chartWidth: 300,
 
-    hMargin: 60, // 表之间水平和垂直间隙
+    hMargin: 80, // 表之间水平和垂直间隙
     vMargin: 100,
 
     columnNr: 4,
@@ -127,8 +127,8 @@ var chart = {
             .range([0, this.chartWidth]);
 
         var n = Math.ceil(this.data.length / 4)
-        this.svgHeight = n * (this.chartHeight + this.vMargin * 2)
-        this.svgWidth  = this.columnNr * (this.chartWidth + this.hMargin * 2)
+        this.svgHeight = n * (this.chartHeight + this.vMargin)
+        this.svgWidth  = this.columnNr * (this.chartWidth + this.hMargin)
 
         // YEAR LINES
         d3.select('#chart svg').remove()
@@ -151,7 +151,7 @@ var chart = {
             //.sort(this.sortFunction[this.uiState.sortBy])
             .attr('transform', function (d, i) {
                 var xOffset = that.hMargin + (i % that.columnNr) * (that.chartWidth + that.hMargin)
-                var yOffset = that.vMargin + parseInt(i / that.columnNr) * (that.chartHeight + that.vMargin)
+                var yOffset =  5 + parseInt(i / that.columnNr) * (that.chartHeight + that.vMargin)
                 return that.translate(xOffset, yOffset);
             })
 
@@ -305,7 +305,7 @@ function genChart(shopId, sort) {
 function init_pagination(eleNr) {
     $(".pagination").paging(eleNr, {
         perpage: 200,
-        format: '[< ncnnn >]',
+        format: '[< ncnnnnnnnn >]',     // 显示10个数字
         onSelect: function (page) {
             var shop_id = get_shop_id()
             var sort_method = get_sort_method()
