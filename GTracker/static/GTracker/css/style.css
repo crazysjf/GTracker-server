@@ -128,11 +128,12 @@ g.good text.create {
     stroke:#bbbbbb;
 }
 
-
+/*
 g.good path {
 	fill: none;
 	stroke: #060668;
 }
+*/
 
 g.good line {
 	stroke: #666;

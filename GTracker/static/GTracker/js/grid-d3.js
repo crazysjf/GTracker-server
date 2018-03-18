@@ -156,7 +156,38 @@ var chart = {
             })
 
 
+        var color_g1 = "#060668"
+        var color_g2 = "#B8860B"
+        var color_g3 = "#B22222"
+
+        var width_g1 = 1
+        var width_g2 = 2
+        var width_g3 = 3
+
+
+        var yScaleParamMapping = [
+            [10,     width_g1, color_g1],
+            [100,    width_g2, color_g1],
+            [1000,   width_g3, color_g1],
+        ]
+
+        function getYScraleParam(max) {
+            for(var i =0; i<yScaleParamMapping.length; i++) {
+                var a = yScaleParamMapping[i]
+                if (max <= a[0])
+                    return a
+            }
+
+            return yScaleParamMapping[yScaleParamMapping.length - 1]
+        }
+
         function yScaleGen(min, max) {
+            var param = getYScraleParam(max)
+            // _max不能写成三元运算符形式，原因不明
+            // var _max = max
+            // if (param[0] > max)
+            //     _max = param[0]
+
             return d3.scale.linear()
                 .domain([min, max])
                 .range([that.chartHeight, 0]);
@@ -204,8 +235,12 @@ var chart = {
                 .classed('axis y', true)
                 .call(yAxis)
 
+            var yScaleParam = getYScraleParam(d.max)
+
             t.append('path')
-                .attr('stroke-width', 2)
+                .attr('stroke-width', yScaleParam[1])
+                .attr('fill', 'none')
+                .attr('stroke', yScaleParam[2])
                  .attr('d', function (d, i) {
                      return svgLineGen(yScale)(d.sales)
                  });
